@@ -1,0 +1,189 @@
+<UserControl x:Class="GasStationIS.Views.UserControls.ShopControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:GasStationIS.ViewModels">
+
+    <UserControl.DataContext>
+        <vm:ShopViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Margin="28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <Button DockPanel.Dock="Right" Content="↻  Обновить"
+                    Style="{StaticResource SecondaryButton}" Command="{Binding RefreshCommand}"/>
+            <StackPanel>
+                <TextBlock Style="{StaticResource SectionTitle}" Text="Магазин при АЗС"/>
+                <TextBlock Style="{StaticResource SectionSubtitle}" Text="Товары, остатки и касса магазина"/>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- 3-column layout -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>      <!-- Catalogue -->
+                <ColumnDefinition Width="260"/>    <!-- Cart -->
+                <ColumnDefinition Width="260"/>    <!-- Add product -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Catalogue -->
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,10,0">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <Button DockPanel.Dock="Right" Content="🗑  Удалить"
+                                Style="{StaticResource DangerButton}"
+                                Command="{Binding DeleteProductCommand}"/>
+                        <TextBlock Style="{StaticResource H3}" Text="Каталог товаров" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Products}"
+                              SelectedItem="{Binding SelectedProduct}"
+                              Style="{StaticResource ModernDataGrid}"
+                              ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}"
+                              RowStyle="{StaticResource ModernDataGridRow}"
+                              CellStyle="{StaticResource ModernDataGridCell}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Наименование" Binding="{Binding Name}"                               Width="*"/>
+                            <DataGridTextColumn Header="Категория"    Binding="{Binding Category}"                           Width="130"/>
+                            <DataGridTextColumn Header="Цена, ₽"      Binding="{Binding Price, StringFormat='{}{0:N2}'}"     Width="90"/>
+                            <DataGridTextColumn Header="Остаток"      Binding="{Binding Stock}"                              Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Border>
+
+            <!-- Cart / Checkout -->
+            <Border Grid.Column="1" Style="{StaticResource Card}" Margin="0,0,10,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource H3}"
+                               Text="Корзина" Margin="0,0,0,12"/>
+
+                    <!-- Add to cart controls -->
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Количество"/>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="+ В корзину"
+                                    Style="{StaticResource PrimaryButton}"
+                                    Command="{Binding AddToCartCommand}"
+                                    Margin="8,0,0,0" Padding="10,8"/>
+                            <TextBox Style="{StaticResource ModernTextBox}"
+                                     Text="{Binding CartQty, UpdateSourceTrigger=PropertyChanged}"/>
+                        </DockPanel>
+                    </StackPanel>
+
+                    <Separator DockPanel.Dock="Top" Style="{StaticResource Divider}"/>
+
+                    <!-- Cart items list -->
+                    <DockPanel>
+                        <!-- Checkout bar at bottom -->
+                        <StackPanel DockPanel.Dock="Bottom">
+                            <Separator Style="{StaticResource Divider}" Margin="0,8"/>
+                            <DockPanel Margin="0,0,0,12">
+                                <TextBlock DockPanel.Dock="Right"
+                                           FontFamily="Segoe UI" FontSize="18" FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBlue}"
+                                           Text="{Binding CartTotal, StringFormat='{}{0:N2} ₽'}"/>
+                                <TextBlock FontFamily="Segoe UI" FontSize="13"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           Text="Итого:" VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <TextBlock Style="{StaticResource FormLabel}" Text="Способ оплаты"/>
+                            <ComboBox Style="{StaticResource ModernComboBox}"
+                                      SelectedItem="{Binding PaymentMethod}"
+                                      Margin="0,0,0,10">
+                                <ComboBoxItem>Наличные</ComboBoxItem>
+                                <ComboBoxItem>Банковская карта</ComboBoxItem>
+                            </ComboBox>
+                            <Button Content="💳  Провести чек"
+                                    Style="{StaticResource SuccessButton}"
+                                    Command="{Binding CheckoutCommand}"/>
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       Style="{StaticResource StatusMessage}"
+                                       TextWrapping="Wrap" Margin="0,8,0,0"
+                                       Visibility="{Binding StatusMessage, Converter={StaticResource NotNullOrEmpty}}"/>
+                        </StackPanel>
+
+                        <!-- Cart items -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding CartItems}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{StaticResource AppBg}" CornerRadius="8"
+                                                Padding="10,8" Margin="0,0,0,6">
+                                            <DockPanel>
+                                                <Button DockPanel.Dock="Right"
+                                                        Content="✕"
+                                                        Background="Transparent" BorderThickness="0"
+                                                        Foreground="{StaticResource AccentRed}"
+                                                        FontSize="12" Cursor="Hand"
+                                                        Command="{Binding DataContext.RemoveFromCartCommand,
+                                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"/>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding ProductName}"
+                                                               FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold"
+                                                               Foreground="{StaticResource TextPrimary}"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock FontFamily="Segoe UI" FontSize="11"
+                                                               Foreground="{StaticResource TextSecondary}">
+                                                        <Run Text="{Binding Quantity}"/>
+                                                        <Run Text=" × "/>
+                                                        <Run Text="{Binding Price, StringFormat='{}{0:N2} ₽'}"/>
+                                                        <Run Text=" = "/>
+                                                        <Run Text="{Binding Total, StringFormat='{}{0:N2} ₽'}"/>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- Add new product -->
+            <Border Grid.Column="2" Style="{StaticResource Card}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H3}" Text="Добавить товар" Margin="0,0,0,16"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Наименование *"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding NewName, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,10"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Категория"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding NewCategory, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,10"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Цена, руб *"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding NewPriceText, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,10"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Остаток, шт *"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding NewStockText, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,10"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Штрихкод"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding NewBarcode, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,16"/>
+
+                        <Button Content="➕  Добавить товар"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding AddProductCommand}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

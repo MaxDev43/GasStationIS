@@ -1,0 +1,133 @@
+<UserControl x:Class="GasStationIS.Views.UserControls.SupplyControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:GasStationIS.ViewModels">
+
+    <UserControl.DataContext>
+        <vm:SupplyViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Margin="28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <Button DockPanel.Dock="Right" Content="↻  Обновить"
+                    Style="{StaticResource SecondaryButton}" Command="{Binding RefreshCommand}"/>
+            <StackPanel>
+                <TextBlock Style="{StaticResource SectionTitle}" Text="Поставки"/>
+                <TextBlock Style="{StaticResource SectionSubtitle}" Text="История поставок и добавление новых"/>
+            </StackPanel>
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="320"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Supply history grid -->
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,12,0">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <Button DockPanel.Dock="Right"
+                                Content="🗑  Удалить"
+                                Style="{StaticResource DangerButton}"
+                                Command="{Binding DeleteCommand}"/>
+                        <TextBlock Style="{StaticResource H3}" Text="История поставок" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Supplies}"
+                              SelectedItem="{Binding SelectedSupply}"
+                              Style="{StaticResource ModernDataGrid}"
+                              ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}"
+                              RowStyle="{StaticResource ModernDataGridRow}"
+                              CellStyle="{StaticResource ModernDataGridCell}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Дата"       Binding="{Binding SupplyDate}"                                Width="130"/>
+                            <DataGridTextColumn Header="Поставщик"  Binding="{Binding SupplierName}"                             Width="140"/>
+                            <DataGridTextColumn Header="Топливо"    Binding="{Binding FuelTypeName}"                             Width="80"/>
+                            <DataGridTextColumn Header="Объём, л"   Binding="{Binding QuantityLiters, StringFormat='{}{0:N0}'}" Width="90"/>
+                            <DataGridTextColumn Header="Цена/л"     Binding="{Binding PricePerLiter,  StringFormat='{}{0:F2}'}" Width="80"/>
+                            <DataGridTextColumn Header="Итого, ₽"   Binding="{Binding TotalCost,      StringFormat='{}{0:N2}'}" Width="110"/>
+                            <DataGridTextColumn Header="Примечание" Binding="{Binding Notes}"                                   Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Border>
+
+            <!-- Right: Add form -->
+            <Border Grid.Column="1" Style="{StaticResource Card}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H3}" Text="Новая поставка" Margin="0,0,0,16"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Поставщик *"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding SupplierName, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Телефон поставщика"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding SupplierPhone, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Вид топлива *"/>
+                        <ComboBox Style="{StaticResource ModernComboBox}"
+                                  ItemsSource="{Binding FuelTypes}"
+                                  SelectedItem="{Binding SelectedFuelType}"
+                                  DisplayMemberPath="Name"
+                                  Margin="0,0,0,12"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Объём, литров *"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding QuantityText, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Цена за литр, руб *"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding PriceText, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12"/>
+
+                        <!-- Calculated total -->
+                        <Border Background="{StaticResource PrimaryLight}" CornerRadius="8"
+                                Padding="12,10" Margin="0,0,0,12">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right"
+                                           FontFamily="Segoe UI" FontSize="14" FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBlue}"
+                                           Text="{Binding CalcTotal}"/>
+                                <TextBlock FontFamily="Segoe UI" FontSize="12"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           Text="Итого:" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </Border>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Дата поставки"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding SupplyDate, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Примечание"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" Height="60"
+                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                 Margin="0,0,0,16"/>
+
+                        <Button Content="➕  Добавить поставку"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding AddCommand}"/>
+
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   Style="{StaticResource StatusMessage}"
+                                   TextWrapping="Wrap" Margin="0,10,0,0"
+                                   Visibility="{Binding StatusMessage, Converter={StaticResource NotNullOrEmpty}}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,115 @@
+<Window x:Class="GasStationIS.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:GasStationIS.ViewModels"
+        Title="Вход в систему"
+        Width="420" Height="540"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <Window.DataContext>
+        <vm:LoginViewModel/>
+    </Window.DataContext>
+
+    <!-- Outer shadow frame -->
+    <Border CornerRadius="16" Background="White">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.2" Color="#000000"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ── Top blue header ─────────────────────────────────── -->
+            <Border Grid.Row="0" CornerRadius="16,16,0,0"
+                    Height="180">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#1D4ED8" Offset="0"/>
+                        <GradientStop Color="#0EA5E9" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- Fuel pump icon (SVG path) -->
+                    <Border Width="64" Height="64" CornerRadius="32"
+                            Background="#FFFFFF20" Margin="0,0,0,12">
+                        <Viewbox Width="36" Height="36">
+                            <Canvas Width="24" Height="24">
+                                <!-- Fuel pump SVG path (Feather icons inspired) -->
+                                <Path Fill="White" Data="M3 22h10V3H3v19zm2-17h6v6H5V5zM19.5 8.5l-1.5 1.5V14a2 2 0 01-2 2v4H17v2h2v-2h1v-4a2 2 0 01-2-2V10l1.5-1.5L19.5 8.5z"/>
+                                <Path Fill="White" Data="M7 6h2v4H7z"/>
+                            </Canvas>
+                        </Viewbox>
+                    </Border>
+
+                    <TextBlock Text="ИС Сети АЗС"
+                               FontFamily="Segoe UI" FontSize="22" FontWeight="Bold"
+                               Foreground="White" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Информационная система управления"
+                               FontFamily="Segoe UI" FontSize="12"
+                               Foreground="#FFFFFFAA" HorizontalAlignment="Center"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ── Login Form ──────────────────────────────────────── -->
+            <StackPanel Grid.Row="1" Margin="36,28,36,28" VerticalAlignment="Center">
+
+                <!-- Drag handle -->
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource FormLabel}"/>
+                </StackPanel.Resources>
+
+                <TextBlock Text="ЛОГИН" Style="{StaticResource FormLabel}" Margin="0,0,0,6"/>
+                <TextBox x:Name="TxtLogin"
+                         Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ModernTextBox}"
+                         KeyDown="OnKeyDown"/>
+
+                <TextBlock Text="ПАРОЛЬ" Style="{StaticResource FormLabel}" Margin="0,16,0,6"/>
+                <PasswordBox x:Name="PwdBox"
+                             Style="{StaticResource ModernPasswordBox}"
+                             KeyDown="OnKeyDown"/>
+
+                <!-- Error message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                           FontFamily="Segoe UI" FontSize="12"
+                           Foreground="{StaticResource AccentRed}"
+                           Margin="0,10,0,0"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource NotNullOrEmpty},
+                                        TargetNullValue=Collapsed, FallbackValue=Collapsed}"/>
+
+                <Button Content="Войти в систему"
+                        Style="{StaticResource PrimaryButton}"
+                        Click="LoginButton_Click"
+                        Margin="0,20,0,0"
+                        Height="42"/>
+
+                <!-- Hint -->
+                <TextBlock Text="По умолчанию: admin / admin123"
+                           FontFamily="Segoe UI" FontSize="11"
+                           Foreground="{StaticResource TextMuted}"
+                           HorizontalAlignment="Center"
+                           Margin="0,12,0,0"/>
+            </StackPanel>
+
+            <!-- ── Close button ────────────────────────────────────── -->
+            <Button Grid.Row="0"
+                    Content="✕"
+                    Click="CloseButton_Click"
+                    VerticalAlignment="Top" HorizontalAlignment="Right"
+                    Margin="8"
+                    Width="28" Height="28"
+                    Background="Transparent" BorderThickness="0"
+                    Foreground="White" FontSize="14" Cursor="Hand"/>
+        </Grid>
+    </Border>
+</Window>
