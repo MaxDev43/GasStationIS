@@ -1,0 +1,143 @@
+<UserControl x:Class="GasStationIS.Views.UserControls.SettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:GasStationIS.ViewModels">
+
+    <UserControl.DataContext>
+        <vm:SettingsViewModel/>
+    </UserControl.DataContext>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28,24">
+
+            <!-- Header -->
+            <TextBlock Style="{StaticResource SectionTitle}" Text="Настройки"/>
+            <TextBlock Style="{StaticResource SectionSubtitle}" Text="Параметры станции и обслуживание базы данных"/>
+
+            <!-- Two column -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="320"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Station info form -->
+                <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H3}" Text="Информация об АЗС" Margin="0,0,0,20"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="12"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="12"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Row 0 -->
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="Название АЗС *"/>
+                                <TextBox Style="{StaticResource ModernTextBox}"
+                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="Телефон"/>
+                                <TextBox Style="{StaticResource ModernTextBox}"
+                                         Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <!-- Row 2 -->
+                            <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="Адрес"/>
+                                <TextBox Style="{StaticResource ModernTextBox}"
+                                         Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <!-- Row 4 -->
+                            <StackPanel Grid.Row="4" Grid.Column="0">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="Директор"/>
+                                <TextBox Style="{StaticResource ModernTextBox}"
+                                         Text="{Binding Director, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="4" Grid.Column="2">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="ИНН"/>
+                                <TextBox Style="{StaticResource ModernTextBox}"
+                                         Text="{Binding Inn, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+
+                            <!-- Row 6 -->
+                            <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="Номер лицензии"/>
+                                <TextBox Style="{StaticResource ModernTextBox}"
+                                         Text="{Binding License, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Content="💾  Сохранить настройки"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding SaveCommand}"
+                                Margin="0,20,0,0" HorizontalAlignment="Left"/>
+
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   Style="{StaticResource StatusMessage}"
+                                   TextWrapping="Wrap" Margin="0,10,0,0"
+                                   Visibility="{Binding StatusMessage, Converter={StaticResource NotNullOrEmpty}}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Right column -->
+                <StackPanel Grid.Column="1">
+
+                    <!-- Database info -->
+                    <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H3}" Text="База данных" Margin="0,0,0,14"/>
+
+                            <TextBlock Style="{StaticResource FormLabel}" Text="Расположение файла БД"/>
+                            <Border Background="{StaticResource AppBg}" CornerRadius="8"
+                                    Padding="12,10" Margin="0,4,0,14">
+                                <TextBlock Text="{Binding DbPath}"
+                                           FontFamily="Consolas" FontSize="11"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           TextWrapping="Wrap"/>
+                            </Border>
+
+                            <Button Content="📦  Создать резервную копию"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding BackupCommand}"
+                                    HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- System info -->
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource H3}" Text="О системе" Margin="0,0,0,14"/>
+
+                            <StackPanel Margin="0,0,0,8">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="СИСТЕМА"/>
+                                <TextBlock FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"
+                                           Text="ИС Сети АЗС v1.0"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,8">
+                                <TextBlock Style="{StaticResource FormLabel}" Text="ПЛАТФОРМА"/>
+                                <TextBlock FontFamily="Segoe UI" FontSize="13"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           Text=".NET Framework 4.8 / WPF / SQLite"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

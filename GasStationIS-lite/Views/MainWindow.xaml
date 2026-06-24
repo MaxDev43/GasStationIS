@@ -1,0 +1,264 @@
+<Window x:Class="GasStationIS.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:GasStationIS.ViewModels"
+        xmlns:uc="clr-namespace:GasStationIS.Views.UserControls"
+        Title="{Binding StationName, StringFormat='{}ИС АЗС — {0}'}"
+        Width="1280" Height="780"
+        MinWidth="1024" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <!-- Root border (rounded corners, shadow) -->
+    <Border CornerRadius="12" ClipToBounds="True">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.15" Color="#000000"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <!-- Sidebar -->
+                <ColumnDefinition Width="240"/>
+                <!-- Content -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ══════════════════════════════════════════════════════
+                 SIDEBAR
+                 ══════════════════════════════════════════════════════ -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource SidebarBg}">
+                <DockPanel>
+
+                    <!-- Logo / Station name -->
+                    <Border DockPanel.Dock="Top"
+                            Height="70" Padding="16,0"
+                            MouseDown="TitleBar_MouseDown"
+                            Cursor="SizeAll">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- Fuel pump icon -->
+                            <Border Width="36" Height="36" CornerRadius="8"
+                                    Background="#1D4ED8" Margin="0,0,10,0">
+                                <Viewbox Width="20" Height="20">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="White" Data="M3 22h10V3H3v19zm2-17h6v6H5V5zm11 2l-1.5 1.5V10a2 2 0 012 2v7h-1v2h2v-2h1v-7a2 2 0 012-2V8.5L19.5 7z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding StationName}"
+                                           FontFamily="Segoe UI" FontSize="13" FontWeight="Bold"
+                                           Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="ИС управления АЗС"
+                                           FontFamily="Segoe UI" FontSize="10"
+                                           Foreground="{StaticResource SidebarText}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Divider -->
+                    <Separator DockPanel.Dock="Top"
+                               Background="#FFFFFF15" Height="1" Margin="16,0"/>
+
+                    <!-- User info -->
+                    <Border DockPanel.Dock="Bottom" Padding="16,10">
+                        <StackPanel>
+                            <Separator Background="#FFFFFF15" Height="1" Margin="0,0,0,10"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Border Width="32" Height="32" CornerRadius="16"
+                                        Background="{StaticResource SidebarItemActive}"
+                                        Margin="0,0,10,0">
+                                    <TextBlock Text="{Binding CurrentUserName[0]}"
+                                               FontFamily="Segoe UI" FontWeight="Bold"
+                                               Foreground="White" FontSize="14"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding CurrentUserName}"
+                                               FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold"
+                                               Foreground="White"
+                                               TextTrimming="CharacterEllipsis" MaxWidth="140"/>
+                                    <TextBlock Text="{Binding CurrentUserRole}"
+                                               FontFamily="Segoe UI" FontSize="10"
+                                               Foreground="{StaticResource SidebarText}"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Content="Выйти из системы"
+                                    Command="{Binding LogoutCommand}"
+                                    FontFamily="Segoe UI" FontSize="12"
+                                    Foreground="{StaticResource SidebarText}"
+                                    Background="Transparent" BorderThickness="0"
+                                    HorizontalAlignment="Left" Cursor="Hand"
+                                    Padding="0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Navigation -->
+                    <StackPanel DockPanel.Dock="Top" Margin="0,8,0,0">
+
+                        <!-- Главная -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Главная"
+                                     Command="{Binding NavDashboardCommand}"
+                                     IsChecked="True">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                        <!-- Топливо -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Топливо"
+                                     Command="{Binding NavFuelCommand}">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M3 22h10V3H3v19zM5 5h6v6H5V5zm11 2l-1.5 1.5V10a2 2 0 012 2v7h-1v2h2v-2h1v-7a2 2 0 012-2V8.5L19.5 7z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                        <!-- Поставки -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Поставки"
+                                     Command="{Binding NavSupplyCommand}">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                        <!-- Продажи -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Продажи"
+                                     Command="{Binding NavSalesCommand}">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                        <!-- Клиенты -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Клиенты"
+                                     Command="{Binding NavCustomerCommand}">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                        <!-- Сотрудники (только Администратор) -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Сотрудники"
+                                     Command="{Binding NavEmployeeCommand}"
+                                     Visibility="{Binding AdminOnlyVisibility}">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                        <!-- Отчёты -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Отчёты"
+                                     Command="{Binding NavReportsCommand}">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                        <!-- Настройки (только Администратор) -->
+                        <RadioButton Style="{StaticResource NavButton}"
+                                     Content="Настройки"
+                                     Command="{Binding NavSettingsCommand}"
+                                     Visibility="{Binding AdminOnlyVisibility}">
+                            <RadioButton.Tag>
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Fill="{StaticResource SidebarText}"
+                                              Data="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </RadioButton.Tag>
+                        </RadioButton>
+
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- ══════════════════════════════════════════════════════
+                 CONTENT AREA
+                 ══════════════════════════════════════════════════════ -->
+            <Grid Grid.Column="1" Background="{StaticResource AppBg}">
+                <Grid.RowDefinitions>
+                    <!-- Topbar -->
+                    <RowDefinition Height="50"/>
+                    <!-- Page content -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Topbar -->
+                <Border Grid.Row="0" Background="White"
+                        BorderBrush="{StaticResource CardBorder}"
+                        BorderThickness="0,0,0,1"
+                        MouseDown="TitleBar_MouseDown" Cursor="SizeAll">
+                    <DockPanel Margin="20,0">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Content="─" Click="MinimizeButton_Click"
+                                    Background="Transparent" BorderThickness="0"
+                                    FontSize="14" Foreground="{StaticResource TextSecondary}"
+                                    Cursor="Hand" Width="36" Height="36"/>
+                            <Button Content="✕" Click="CloseButton_Click"
+                                    Background="Transparent" BorderThickness="0"
+                                    FontSize="14" Foreground="{StaticResource TextSecondary}"
+                                    Cursor="Hand" Width="36" Height="36"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding StationName}"
+                                   FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   VerticalAlignment="Center"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- Page switcher -->
+                <ContentControl Grid.Row="1" x:Name="ContentArea"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

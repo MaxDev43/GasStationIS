@@ -1,0 +1,141 @@
+<UserControl x:Class="GasStationIS.Views.UserControls.SalesControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:GasStationIS.ViewModels">
+
+    <UserControl.DataContext>
+        <vm:SalesViewModel/>
+    </UserControl.DataContext>
+
+    <Grid Margin="28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Style="{StaticResource SectionTitle}" Text="Продажи топлива"/>
+                <TextBlock Style="{StaticResource SectionSubtitle}" Text="Регистрация отпуска топлива на колонках"/>
+            </StackPanel>
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="310"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: History -->
+            <Border Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,12,0">
+                <DockPanel>
+                    <!-- Filter bar -->
+                    <Border DockPanel.Dock="Top" Margin="0,0,0,14">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="С:" FontFamily="Segoe UI" FontSize="12"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <DatePicker SelectedDate="{Binding FilterFrom}"
+                                        Style="{StaticResource ModernDatePicker}"
+                                        Width="130" Margin="0,0,12,0"/>
+                            <TextBlock Text="По:" FontFamily="Segoe UI" FontSize="12"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <DatePicker SelectedDate="{Binding FilterTo}"
+                                        Style="{StaticResource ModernDatePicker}"
+                                        Width="130" Margin="0,0,12,0"/>
+                            <Button Content="Найти" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding FilterCommand}"/>
+                            <Button Content="🗑  Удалить" Style="{StaticResource DangerButton}"
+                                    Command="{Binding DeleteCommand}" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <DataGrid ItemsSource="{Binding Sales}"
+                              SelectedItem="{Binding SelectedSale}"
+                              Style="{StaticResource ModernDataGrid}"
+                              ColumnHeaderStyle="{StaticResource ModernDataGridColumnHeader}"
+                              RowStyle="{StaticResource ModernDataGridRow}"
+                              CellStyle="{StaticResource ModernDataGridCell}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Дата/Время"  Binding="{Binding SaleDatetime}"                             Width="140"/>
+                            <DataGridTextColumn Header="Топливо"     Binding="{Binding FuelTypeName}"                             Width="80"/>
+                            <DataGridTextColumn Header="Литры"       Binding="{Binding Liters,        StringFormat='{}{0:F2} л'}" Width="90"/>
+                            <DataGridTextColumn Header="Цена/л"      Binding="{Binding PricePerLiter, StringFormat='{}{0:F2}'}"   Width="80"/>
+                            <DataGridTextColumn Header="Сумма, ₽"    Binding="{Binding TotalAmount,   StringFormat='{}{0:N2}'}"   Width="110"/>
+                            <DataGridTextColumn Header="Оплата"      Binding="{Binding PaymentMethod}"                            Width="100"/>
+                            <DataGridTextColumn Header="Клиент"      Binding="{Binding CustomerName}"                             Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Border>
+
+            <!-- Right: New sale form -->
+            <Border Grid.Column="1" Style="{StaticResource Card}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource H3}" Text="Новая продажа" Margin="0,0,0,16"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Вид топлива *"/>
+                        <ComboBox Style="{StaticResource ModernComboBox}"
+                                  ItemsSource="{Binding FuelTypes}"
+                                  SelectedItem="{Binding SelectedFuelType}"
+                                  DisplayMemberPath="Name"
+                                  Margin="0,0,0,12"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Объём, литров *"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding LitersText, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12"/>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Цена за литр, руб"/>
+                        <TextBox Style="{StaticResource ModernTextBox}"
+                                 Text="{Binding PriceText, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,12"/>
+
+                        <!-- Total -->
+                        <Border Background="{StaticResource PrimaryLight}" CornerRadius="8"
+                                Padding="12,10" Margin="0,0,0,12">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right"
+                                           FontFamily="Segoe UI" FontSize="14" FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBlue}"
+                                           Text="{Binding CalcTotal}"/>
+                                <TextBlock FontFamily="Segoe UI" FontSize="12"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           Text="Итого:" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </Border>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Способ оплаты"/>
+                        <ComboBox Style="{StaticResource ModernComboBox}"
+                                  SelectedItem="{Binding PaymentMethod}"
+                                  Margin="0,0,0,12">
+                            <ComboBoxItem>Наличные</ComboBoxItem>
+                            <ComboBoxItem>Банковская карта</ComboBoxItem>
+                            <ComboBoxItem>Топливная карта</ComboBoxItem>
+                            <ComboBoxItem>Безналичный расчёт</ComboBoxItem>
+                        </ComboBox>
+
+                        <TextBlock Style="{StaticResource FormLabel}" Text="Клиент (необязательно)"/>
+                        <ComboBox Style="{StaticResource ModernComboBox}"
+                                  ItemsSource="{Binding Customers}"
+                                  SelectedItem="{Binding SelectedCustomer}"
+                                  DisplayMemberPath="FullName"
+                                  Margin="0,0,0,12"/>
+
+                        <Button Content="⛽  Зарегистрировать продажу"
+                                Style="{StaticResource SuccessButton}"
+                                Command="{Binding AddCommand}"/>
+
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   Style="{StaticResource StatusMessage}"
+                                   TextWrapping="Wrap" Margin="0,10,0,0"
+                                   Visibility="{Binding StatusMessage, Converter={StaticResource NotNullOrEmpty}}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
